@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:blocdisk/utils.dart';
@@ -40,6 +41,16 @@ class FileModel {
       name: fileData[0],
       size: fileData[1].toInt(),
       type: GeneralFuntions.getFileType(fileData[0]),
+    );
+  }
+
+  factory FileModel.fromFile(File file, int fileSize) {
+    var filename = GeneralFuntions.getFileName(file.path);
+    var filetype = GeneralFuntions.getFileType(filename);
+    return FileModel(
+      name: "filename",
+      size: fileSize,
+      type: filetype,
     );
   }
 }

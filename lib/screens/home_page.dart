@@ -16,7 +16,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<FileWidget> fileWidgets = [];
+  List<FileModel> filesList = [];
   var solConnect = SolConnect();
+
+  @override
+  void initState() {
+    getFiles();
+    super.initState();
+  }
 
   Future<void> onUploadFile() async {
     var result = null;
@@ -27,14 +35,16 @@ class _HomePageState extends State<HomePage> {
 
     if (result != null) {
       File file = File(result.files.first.path!);
-      // var response = await PinataClient.uploadFile(file);
-      // var response = await PinataClient.testAuth();
-      // response = "ipfs hash: $response";
-      // print(response);
-      // setState(() {
-      //   uploadResult = response;
-      // });
 
+      var fileSize = await file.length();
+
+      setState(() {
+        filesList.add(FileModel.fromFile(file, fileSize));
+        fileWidgets.add(FileWidget(
+          file: filesList.last,
+          isUploading: true,
+        ));
+      });
       await solConnect.addFile(file);
       await Future.delayed(const Duration(seconds: 15));
       getFiles();
@@ -43,40 +53,17 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  List<FileModel> filesList = [
-    // FileModel(
-    //   name: "filename",
-    //   size: 134432213,
-    //   type: "jpg",
-    // ),
-    // FileModel(
-    //   name: "filename",
-    //   size: 1344328213,
-    //   type: "jpg",
-    // ),
-    // FileModel(
-    //   name: "filename",
-    //   size: 134432213,
-    //   type: "jpg",
-    // ),
-    // FileModel(
-    //   name: "filename",
-    //   size: 134432213,
-    //   type: "jpg",
-    // ),
-  ];
-
-  @override
-  void initState() {
-    getFiles();
-    super.initState();
-  }
-
   void getFiles() async {
     var newFiles = await solConnect.retriveFiles();
     setState(() {
       // filesList.addAll(newFiles);
       filesList = newFiles;
+      fileWidgets = filesList
+          .map((e) => FileWidget(
+                file: e,
+                isUploading: false,
+              ))
+          .toList();
     });
   }
 
@@ -95,10 +82,8 @@ class _HomePageState extends State<HomePage> {
       ),
       body: ListView.builder(
         itemCount: filesList.length,
-        itemBuilder: (context, index) => FileWidget(
-          file: filesList[index],
-          isUploading: false,
-        ),
+        itemBuilder: (context, index) =>
+            fileWidgets[filesList.length - (index + 1)],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: onUploadFile,
@@ -111,39 +96,66 @@ class _HomePageState extends State<HomePage> {
 }
 
 class FileWidget extends StatelessWidget {
-  final FileModel file;
-  final bool isUploading;
   const FileWidget({
     super.key,
     required this.file,
     required this.isUploading,
   });
 
+  final FileModel file;
+  final bool isUploading;
+
   @override
   Widget build(BuildContext context) {
+    print("is uploading $isUploading");
     return SizedBox(
       width: double.infinity,
       height: 80,
       child: Card(
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Image.asset("assets/icons/file_icon.png"),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
               children: [
-                const SizedBox(
-                  height: 10,
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Image.asset("assets/icons/file_icon.png"),
                 ),
-                Text(file.name),
-                Text(
-                  file.getFileSize(),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text(file.name),
+                    Text(
+                      file.getFileSize(),
+                    ),
+                  ],
                 ),
               ],
             ),
+            if (!isUploading)
+              Row(
+                children: [
+                  const Text(
+                    "uploading",
+                    style: TextStyle(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(right: 10),
+                    width: 20,
+                    height: 20,
+                    child: const CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ],
+              ),
           ],
         ),
       ),
