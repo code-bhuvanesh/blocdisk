@@ -33,6 +33,7 @@ flutter:
 
   assets:
     - assets/abi.json
+    - assets/icons/file_icon.png
   
   
 
