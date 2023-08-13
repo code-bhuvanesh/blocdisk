@@ -34,7 +34,13 @@ class _UploadFileState extends State<UploadFile> {
   String uploadResult = "";
 
   Future<void> onUploadFile() async {
-    var result = await FilePicker.platform.pickFiles();
+    var result = null;
+    result = await FilePicker.platform.pickFiles();
+    var solConnect = SolConnect();
+    await solConnect.loadContract();
+
+    await solConnect.getBalance();
+    await solConnect.retriveFiles();
 
     if (result != null) {
       File file = File(result.files.first.path!);
@@ -45,9 +51,9 @@ class _UploadFileState extends State<UploadFile> {
       // setState(() {
       //   uploadResult = response;
       // });
-      var solConnect = SolConnect();
-      await solConnect.loadContract();
+
       await solConnect.addFile(file);
+      await Future.delayed(Duration(seconds: 5));
       await solConnect.retriveFiles();
     } else {
       Fluttertoast.showToast(msg: "select a file to upload");

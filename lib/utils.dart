@@ -57,7 +57,7 @@ class SolConnect {
 
   Future<void> loadContract() async {
     String abi = await rootBundle.loadString("assets/abi.json");
-    String contractAddress = "0x898208CEe3A1B7bBE198e48D2310C81482411C7b";
+    String contractAddress = contractaddress;
     final contract = DeployedContract(
       ContractAbi.fromJson(abi, "disk.sol"),
       EthereumAddress.fromHex(contractAddress),
@@ -86,6 +86,7 @@ class SolConnect {
         contract: _contract,
         function: ethFunction,
         parameters: args,
+        from: EthereumAddress.fromHex(myaddress),
         // maxGas: 100000,
       ),
       chainId: 11155111,
@@ -93,12 +94,26 @@ class SolConnect {
     return result;
   }
 
+  Future<void> getBalance() async {
+    var address = EthereumAddress.fromHex(myaddress);
+    EtherAmount balance = await _ethClient.getBalance(address);
+    print("balance");
+    print(balance.getValueInUnit(EtherUnit.ether));
+  }
+
   //call sol functions
 
   Future<void> addFile(File file) async {
     var filehash = await PinataClient.uploadFile(file);
-    await _submit("add", [EthereumAddress.fromHex(myaddress), filehash]);
-    print("file: ${file.path}");
+    var result = await _submit("add", [
+      EthereumAddress.fromHex(myaddress),
+      filehash,
+      GeneralFuntions.getFileName(file.path),
+      BigInt.from(await file.length()),
+    ]);
+    print("sumbit result : $result");
+    print("filename: ${GeneralFuntions.getFileName(file.path)}");
+    print("filesize: ${await file.length()}");
     print("filehash: $filehash");
     print("file added");
   }
@@ -107,7 +122,14 @@ class SolConnect {
     var result = await _query("display", [EthereumAddress.fromHex(myaddress)]);
     print("result.............");
     print(result);
+    // print(result);
     print("end result.............");
     return "";
+  }
+}
+
+class GeneralFuntions {
+  static String getFileName(String path) {
+    return path.substring(path.lastIndexOf("/") + 1);
   }
 }
