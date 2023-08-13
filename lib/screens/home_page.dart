@@ -136,7 +136,7 @@ class FileWidget extends StatelessWidget {
                 ),
               ],
             ),
-            if (!isUploading)
+            if (isUploading)
               Row(
                 children: [
                   const Text(
