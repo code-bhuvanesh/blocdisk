@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:blocdisk/model/file_model.dart';
 import 'package:blocdisk/utils.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -15,11 +16,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  var solConnect = SolConnect();
+
   Future<void> onUploadFile() async {
     var result = null;
-    // result = await FilePicker.platform.pickFiles();
-    var solConnect = SolConnect();
-    await solConnect.loadContract();
+    result = await FilePicker.platform.pickFiles();
 
     await solConnect.getBalance();
     await solConnect.retriveFiles();
@@ -35,35 +36,49 @@ class _HomePageState extends State<HomePage> {
       // });
 
       await solConnect.addFile(file);
-      await Future.delayed(Duration(seconds: 5));
-      await solConnect.retriveFiles();
+      await Future.delayed(const Duration(seconds: 15));
+      getFiles();
     } else {
       Fluttertoast.showToast(msg: "select a file to upload");
     }
   }
 
   List<FileModel> filesList = [
-    FileModel(
-      name: "filename",
-      size: 134432213,
-      type: "jpg",
-    ),
-    FileModel(
-      name: "filename",
-      size: 134432213,
-      type: "jpg",
-    ),
-    FileModel(
-      name: "filename",
-      size: 134432213,
-      type: "jpg",
-    ),
-    FileModel(
-      name: "filename",
-      size: 134432213,
-      type: "jpg",
-    ),
+    // FileModel(
+    //   name: "filename",
+    //   size: 134432213,
+    //   type: "jpg",
+    // ),
+    // FileModel(
+    //   name: "filename",
+    //   size: 1344328213,
+    //   type: "jpg",
+    // ),
+    // FileModel(
+    //   name: "filename",
+    //   size: 134432213,
+    //   type: "jpg",
+    // ),
+    // FileModel(
+    //   name: "filename",
+    //   size: 134432213,
+    //   type: "jpg",
+    // ),
   ];
+
+  @override
+  void initState() {
+    getFiles();
+    super.initState();
+  }
+
+  void getFiles() async {
+    var newFiles = await solConnect.retriveFiles();
+    setState(() {
+      // filesList.addAll(newFiles);
+      filesList = newFiles;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +95,10 @@ class _HomePageState extends State<HomePage> {
       ),
       body: ListView.builder(
         itemCount: filesList.length,
-        itemBuilder: (context, index) => FileWidget(file: filesList[index]),
+        itemBuilder: (context, index) => FileWidget(
+          file: filesList[index],
+          isUploading: false,
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: onUploadFile,
@@ -94,9 +112,11 @@ class _HomePageState extends State<HomePage> {
 
 class FileWidget extends StatelessWidget {
   final FileModel file;
+  final bool isUploading;
   const FileWidget({
     super.key,
     required this.file,
+    required this.isUploading,
   });
 
   @override

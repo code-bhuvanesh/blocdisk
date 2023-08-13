@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:blocdisk/constants.dart';
+import 'package:blocdisk/model/file_model.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:web3dart/contracts.dart';
@@ -50,22 +51,27 @@ class SolConnect {
   late Web3Client _ethClient;
   late DeployedContract _contract;
 
+  bool _contractLoaded = false;
+
   SolConnect() {
     _httpClient = http.Client();
     _ethClient = Web3Client(infuraURL, _httpClient);
   }
 
   Future<void> loadContract() async {
-    String abi = await rootBundle.loadString("assets/abi.json");
-    String contractAddress = contractaddress;
-    final contract = DeployedContract(
-      ContractAbi.fromJson(abi, "disk.sol"),
-      EthereumAddress.fromHex(contractAddress),
-    ); // disk => sol file name
-    _contract = contract;
+    if (!_contractLoaded) {
+      String abi = await rootBundle.loadString("assets/abi.json");
+      String contractAddress = contractaddress;
+      final contract = DeployedContract(
+        ContractAbi.fromJson(abi, "disk.sol"),
+        EthereumAddress.fromHex(contractAddress),
+      ); // disk => sol file name
+      _contract = contract;
+    }
   }
 
   Future<List<dynamic>> _query(String funtionName, List<dynamic> args) async {
+    await loadContract();
     final ethFuntion = _contract.function(funtionName);
     final result = await _ethClient.call(
       contract: _contract,
@@ -76,6 +82,7 @@ class SolConnect {
   }
 
   Future<String> _submit(String funtionName, List<dynamic> args) async {
+    await loadContract();
     EthPrivateKey credential = EthPrivateKey.fromHex(
       privateAddress,
     );
@@ -118,18 +125,24 @@ class SolConnect {
     print("file added");
   }
 
-  Future<String> retriveFiles() async {
+  Future<List<FileModel>> retriveFiles() async {
     var result = await _query("display", [EthereumAddress.fromHex(myaddress)]);
-    print("result.............");
     print(result);
-    // print(result);
-    print("end result.............");
-    return "";
+    if (result[0] != null) {
+      return (result[0] as List<dynamic>)
+          .map((e) => FileModel.fromList(e))
+          .toList();
+    }
+    return [];
   }
 }
 
 class GeneralFuntions {
   static String getFileName(String path) {
     return path.substring(path.lastIndexOf("/") + 1);
+  }
+
+  static String getFileType(String filename) {
+    return filename.substring(filename.lastIndexOf(".") + 1);
   }
 }

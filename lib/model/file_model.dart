@@ -1,5 +1,6 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:math';
+
+import 'package:blocdisk/utils.dart';
 
 class FileModel {
   final String name;
@@ -16,13 +17,29 @@ class FileModel {
     if (size < pow(sizeConst, 1)) {
       return "${size.toDouble()} B";
     } else if (size < pow(sizeConst, 2)) {
-      return "${size / pow(sizeConst, 1)} kB";
+      return "${(size / pow(sizeConst, 1)).toStringAsFixed(2)} kB";
     } else if (size < pow(sizeConst, 3)) {
-      return "${size / pow(sizeConst, 2)} MB";
+      return "${(size / pow(sizeConst, 2)).toStringAsFixed(2)} MB";
     } else if (size < pow(sizeConst, 4)) {
-      return "${size / pow(sizeConst, 3)} GB";
+      return "${(size / pow(sizeConst, 3)).toStringAsFixed(2)} GB";
     } else {
-      return "${size / pow(sizeConst, 4)} TB";
+      return "${(size / pow(sizeConst, 4)).toStringAsFixed(2)} TB";
     }
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'name': name,
+      'size': size,
+      'type': type,
+    };
+  }
+
+  factory FileModel.fromList(List<dynamic> fileData) {
+    return FileModel(
+      name: fileData[0],
+      size: fileData[1].toInt(),
+      type: GeneralFuntions.getFileType(fileData[0]),
+    );
   }
 }
