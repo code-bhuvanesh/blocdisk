@@ -3,7 +3,9 @@ import 'dart:io';
 
 import 'package:blocdisk/constants.dart';
 import 'package:blocdisk/model/file_model.dart';
+import 'package:blocdisk/model/user.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:web3dart/contracts.dart';
 import 'package:web3dart/web3dart.dart';
@@ -84,7 +86,7 @@ class SolConnect {
   Future<String> _submit(String funtionName, List<dynamic> args) async {
     await loadContract();
     EthPrivateKey credential = EthPrivateKey.fromHex(
-      privateAddress,
+      User.instance.privateKey,
     );
     final ethFunction = _contract.function(funtionName);
     final result = await _ethClient.sendTransaction(
@@ -93,7 +95,7 @@ class SolConnect {
         contract: _contract,
         function: ethFunction,
         parameters: args,
-        from: EthereumAddress.fromHex(myaddress),
+        from: EthereumAddress.fromHex(User.instance.publicKey),
         // maxGas: 100000,
       ),
       chainId: 11155111,
@@ -102,7 +104,7 @@ class SolConnect {
   }
 
   Future<void> getBalance() async {
-    var address = EthereumAddress.fromHex(myaddress);
+    var address = EthereumAddress.fromHex(User.instance.publicKey);
     EtherAmount balance = await _ethClient.getBalance(address);
     print("balance");
     print(balance.getValueInUnit(EtherUnit.ether));
@@ -113,7 +115,7 @@ class SolConnect {
   Future<void> addFile(File file) async {
     var filehash = await PinataClient.uploadFile(file);
     var result = await _submit("add", [
-      EthereumAddress.fromHex(myaddress),
+      EthereumAddress.fromHex(User.instance.publicKey),
       filehash,
       GeneralFuntions.getFileName(file.path),
       BigInt.from(await file.length()),
@@ -126,7 +128,8 @@ class SolConnect {
   }
 
   Future<List<FileModel>> retriveFiles() async {
-    var result = await _query("display", [EthereumAddress.fromHex(myaddress)]);
+    var result = await _query(
+        "display", [EthereumAddress.fromHex(User.instance.publicKey)]);
     print(result);
     if (result[0] != null) {
       return (result[0] as List<dynamic>)
@@ -144,5 +147,42 @@ class GeneralFuntions {
 
   static String getFileType(String filename) {
     return filename.substring(filename.lastIndexOf(".") + 1);
+  }
+}
+
+class SecureStorage {
+  final _storage = const FlutterSecureStorage(
+    aOptions: AndroidOptions(
+      encryptedSharedPreferences: true,
+    ),
+  );
+
+  Future<String> readSecureData(String key) async {
+    String value = "";
+    try {
+      value = (await _storage.read(key: key)) ?? "";
+    } catch (e) {
+      print(e);
+    }
+    return value;
+  }
+
+  Future<void> deleteSecureData(String key) async {
+    try {
+      await _storage.delete(key: key);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> writeSecureData(String key, String value) async {
+    try {
+      await _storage.write(
+        key: key,
+        value: value,
+      );
+    } catch (e) {
+      print(e);
+    }
   }
 }

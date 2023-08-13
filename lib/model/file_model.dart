@@ -7,10 +7,12 @@ class FileModel {
   final String name;
   final int size;
   final String type;
+  final String hash;
   FileModel({
     required this.name,
     required this.size,
     required this.type,
+    required this.hash,
   });
 
   String getFileSize() {
@@ -36,11 +38,14 @@ class FileModel {
     };
   }
 
+ 
+
   factory FileModel.fromList(List<dynamic> fileData) {
     return FileModel(
       name: fileData[0],
       size: fileData[1].toInt(),
       type: GeneralFuntions.getFileType(fileData[0]),
+      hash: fileData[2],
     );
   }
 
@@ -48,9 +53,10 @@ class FileModel {
     var filename = GeneralFuntions.getFileName(file.path);
     var filetype = GeneralFuntions.getFileType(filename);
     return FileModel(
-      name: "filename",
+      name: filename,
       size: fileSize,
       type: filetype,
+      hash: "",
     );
   }
 }
