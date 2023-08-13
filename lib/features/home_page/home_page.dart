@@ -145,7 +145,7 @@ class _HomePageState extends State<HomePage> {
                 itemBuilder: (context, index) =>
                     fileWidgets[filesList.length - (index + 1)],
               )
-            : filesList.isEmpty
+            : filesList.isEmpty && !isLoading
                 ? const Center(
                     child: Text("no files uploaded"),
                   )
