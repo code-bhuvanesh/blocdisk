@@ -44,14 +44,20 @@ class _MyFilesTabState extends State<MyFilesTab> {
 
       setState(() {
         filesList.add(MyFileModel.fromFile(file, fileSize));
-        fileWidgets.add(BlocProvider(
-          create: (context) => HomeBloc(),
-          child: FileWidget(
-            file: filesList.last,
-            isUploading: true,
-            parentContext: context,
-            delteFile: () => delteFile(fileWidgets.length),
-          ),
+        // fileWidgets.add(BlocProvider(
+        //   create: (context) => HomeBloc(),
+        //   child: FileWidget(
+        //     file: filesList.last,
+        //     isUploading: true,
+        //     parentContext: context,
+        //     delteFile: () => delteFile(fileWidgets.length),
+        //   ),
+        // ));
+        fileWidgets.add(FileWidget(
+          file: filesList.last,
+          isUploading: true,
+          parentContext: context,
+          delteFile: () => delteFile(fileWidgets.length),
         ));
       });
     } else {
@@ -59,11 +65,13 @@ class _MyFilesTabState extends State<MyFilesTab> {
     }
   }
 
+  
   void delteFile(int index) {
     setState(() {
       fileWidgets.removeAt(index);
       filesList.removeAt(index);
     });
+    getFiles();
   }
 
   void getFiles() async {

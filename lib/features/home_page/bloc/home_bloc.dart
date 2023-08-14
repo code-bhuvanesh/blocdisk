@@ -110,8 +110,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     ShareFileEvent event,
     Emitter<HomeState> emit,
   ) async {
-    var sharedFiles = await solConnect.readSharedFiles();
-    emit(SharedFilesRecived(newFiles: sharedFiles));
+    await solConnect.shareFile(event.filehash, event.anotherUserAddress);
+    emit(FileShared());
   }
 
   FutureOr<void> deleteFileEvent(

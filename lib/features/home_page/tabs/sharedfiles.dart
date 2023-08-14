@@ -73,7 +73,7 @@ class _SharedFilesTabState extends State<SharedFilesTab> {
               )
             : filesList.isEmpty && !isLoading
                 ? const Center(
-                    child: Text("no files uploaded"),
+                    child: Text("no files shared"),
                   )
                 : const Center(
                     child: CircularProgressIndicator(),

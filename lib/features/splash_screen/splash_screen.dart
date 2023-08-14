@@ -1,6 +1,7 @@
 import 'package:blocdisk/features/auth/bloc/auth_bloc.dart';
 import 'package:blocdisk/features/login_page/login_page.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../home_page/home_page.dart';
@@ -32,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
               .pushNamedAndRemoveUntil(LoginPage.routename, (route) => false);
         }
       },
-      child: Container(),
+      child: const Scaffold(),
     );
   }
 }

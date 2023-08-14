@@ -1,11 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
+import 'package:blocdisk/features/home_page/widgets/enterUserAddressMenu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:blocdisk/features/home_page/widgets/popup_menu.dart';
+import 'package:blocdisk/features/home_page/widgets/context_menu.dart';
 
 import '../../../constants.dart';
 import '../../../model/my_file_model.dart';
@@ -47,8 +48,21 @@ class _FileWidgetState extends State<FileWidget> {
     _tapPosition = details.globalPosition;
   }
 
-  void _shareFile() {
-    context.read<HomeBloc>().add(ShareFileEvent(filehash: widget.file.hash));
+  Future<void> _shareFile() async {
+    String? anotherUserAddress = await showDialog(
+      context: context,
+      builder: (context) => AddressPopupMenu(),
+    );
+    if (anotherUserAddress != null) {
+      if (mounted) {
+        context.read<HomeBloc>().add(
+              ShareFileEvent(
+                filehash: widget.file.hash,
+                anotherUserAddress: anotherUserAddress,
+              ),
+            );
+      }
+    }
   }
 
   void _deleteFile() {

@@ -122,20 +122,20 @@ class SolConnect {
       Fluttertoast.showToast(msg: "you cannot share to yourself");
       return;
     }
-    await _query("giveAnotherUserAcess", [
+    await _submit("giveAnotherUserAcess", [
       EthereumAddress.fromHex(User.instance.publicKey),
       EthereumAddress.fromHex(anotherUser),
+      filehash,
     ]);
 
     Fluttertoast.showToast(msg: "file shared");
   }
 
-  Future<List<MyFileModel>> deleteFile(String filehash) async {
-    await _query("deleteFile", [
+  Future<void> deleteFile(String filehash) async {
+    print(await _submit("deleteFile", [
       EthereumAddress.fromHex(User.instance.publicKey),
       filehash,
-    ]);
+    ]));
     Fluttertoast.showToast(msg: "file will be deleted within 20sec");
-    return [];
   }
 }

@@ -34,8 +34,10 @@ class GetSharedFilesEvent extends HomeEvent {}
 
 class ShareFileEvent extends HomeEvent {
   final String filehash;
+  final String anotherUserAddress;
   ShareFileEvent({
     required this.filehash,
+    required this.anotherUserAddress,
   });
 }
 

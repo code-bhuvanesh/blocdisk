@@ -64,7 +64,13 @@
 			}
 		],
 		"name": "deleteFile",
-		"outputs": [],
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
@@ -89,6 +95,49 @@
 		"name": "giveAnotherUserAcess",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "useraddress",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "username",
+				"type": "string"
+			}
+		],
+		"name": "setUserName",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "useraddress",
+				"type": "address"
+			}
+		],
+		"name": "getUsername",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -145,6 +194,11 @@
 						"type": "address"
 					},
 					{
+						"internalType": "string",
+						"name": "username",
+						"type": "string"
+					},
+					{
 						"components": [
 							{
 								"internalType": "string",
@@ -163,7 +217,7 @@
 							}
 						],
 						"internalType": "struct BlocDisk.File",
-						"name": "File",
+						"name": "file",
 						"type": "tuple"
 					}
 				],
