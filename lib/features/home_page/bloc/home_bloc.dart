@@ -118,6 +118,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     DeleteFileEvent event,
     Emitter<HomeState> emit,
   ) async {
-    
+    await solConnect.deleteFile(event.filehash);
+    emit(FileDeleted());
   }
 }

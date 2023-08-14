@@ -7,6 +7,7 @@ import 'package:blocdisk/model/user.dart';
 import 'package:blocdisk/utils/pinata_client.dart';
 import 'package:blocdisk/utils/utils.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:web3dart/web3dart.dart';
 
@@ -115,16 +116,26 @@ class SolConnect {
     return [];
   }
 
-  Future<List<MyFileModel>> shareFile(String filehash, anotherUser) async {
-    var result = await _query("readSharedFiles", [
-      EthereumAddress.fromHex(User.instance.publicKey),
-    ]);
-    print("shared files: $result");
-    if (result[0] != null) {
-      return (result[0] as List<dynamic>)
-          .map((e) => MyFileModel.fromList(e))
-          .toList();
+  Future<void> shareFile(String filehash, String anotherUser) async {
+    if (User.instance.publicKey == anotherUser) {
+      // throw Exception("you cannot share to yourself");
+      Fluttertoast.showToast(msg: "you cannot share to yourself");
+      return;
     }
+    await _query("giveAnotherUserAcess", [
+      EthereumAddress.fromHex(User.instance.publicKey),
+      EthereumAddress.fromHex(anotherUser),
+    ]);
+
+    Fluttertoast.showToast(msg: "file shared");
+  }
+
+  Future<List<MyFileModel>> deleteFile(String filehash) async {
+    await _query("deleteFile", [
+      EthereumAddress.fromHex(User.instance.publicKey),
+      filehash,
+    ]);
+    Fluttertoast.showToast(msg: "file will be deleted within 20sec");
     return [];
   }
 }
