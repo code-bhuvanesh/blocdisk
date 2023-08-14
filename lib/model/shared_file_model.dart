@@ -5,12 +5,14 @@ import 'package:blocdisk/utils/utils.dart';
 
 class SharedFileModel extends MyFileModel {
   final String owner;
+  final String username;
   SharedFileModel({
     required String name,
     required int size,
     required String type,
     required String hash,
     required this.owner,
+    required this.username,
   }) : super(
           name: name,
           size: size,
@@ -33,21 +35,14 @@ class SharedFileModel extends MyFileModel {
     }
   }
 
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'name': name,
-      'size': size,
-      'type': type,
-    };
-  }
-
   factory SharedFileModel.fromList(List<dynamic> fileData) {
     return SharedFileModel(
-      name: fileData[1][0],
-      size: fileData[1][1].toInt(),
+      name: fileData[2][0],
+      size: fileData[2][1].toInt(),
       type: GeneralFuntions.getFileType(fileData[1][0]),
-      hash: fileData[1][2],
+      hash: fileData[2][2],
       owner: fileData[0].toString(),
+      username: fileData[1],
     );
   }
 }
