@@ -2,14 +2,15 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
-import 'package:blocdisk/model/file_model.dart';
-import 'package:blocdisk/utils.dart';
+import 'package:blocdisk/model/my_file_model.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../constants.dart';
+import '../../../model/shared_file_model.dart';
+import '../../../utils/solconnect.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
@@ -20,13 +21,18 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<DownloadedProgress>(downloadedProgress);
     on<OpenFileEvent>(openFileEvent);
     on<UploadFileEvent>(uploadFileEvent);
-    on<GetFielsEvent>(getFilesEvent);
+    on<GetMyFilesEvent>(getMyFilesEvent);
+    on<GetSharedFilesEvent>(getSharedFilesEvent);
+    on<ShareFileEvent>(shareFileEvent);
+    on<DeleteFileEvent>(deleteFileEvent);
   }
 
   var solConnect = SolConnect();
 
   Future<FutureOr<void>> downloadFileEvent(
-      DownloadFileEvent event, Emitter<HomeState> emit) async {
+    DownloadFileEvent event,
+    Emitter<HomeState> emit,
+  ) async {
     var fileModel = event.file;
     File file = File(downloadLocation + fileModel.name);
     if (!await file.exists()) {
@@ -57,29 +63,61 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   FutureOr<void> downloadedProgress(
-      DownloadedProgress event, Emitter<HomeState> emit) {
+    DownloadedProgress event,
+    Emitter<HomeState> emit,
+  ) {
     emit(FileDownloadingProgress(progress: event.progress));
     emit(HomeInitial());
   }
 
-  FutureOr<void> openFileEvent(OpenFileEvent event, Emitter<HomeState> emit) {
+  FutureOr<void> openFileEvent(
+    OpenFileEvent event,
+    Emitter<HomeState> emit,
+  ) {
     OpenFile.open("$downloadLocation/${event.filename}");
     emit(FileOpened());
   }
 
   FutureOr<void> uploadFileEvent(
-      UploadFileEvent event, Emitter<HomeState> emit) async {
+    UploadFileEvent event,
+    Emitter<HomeState> emit,
+  ) async {
     await solConnect.getBalance();
-    await solConnect.retriveFiles();
+    await solConnect.readMyFiles();
     await solConnect.addFile(event.uploadfile);
     await Future.delayed(const Duration(seconds: 15));
-    add(GetFielsEvent());
+    add(GetMyFilesEvent());
     emit(FileUploaded(result: "uploaded"));
   }
 
-  Future<FutureOr<void>> getFilesEvent(
-      GetFielsEvent event, Emitter<HomeState> emit) async {
-    var newFiles = await solConnect.retriveFiles();
-    emit(FilesRecived(newFiles: newFiles));
+  Future<FutureOr<void>> getMyFilesEvent(
+    GetMyFilesEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    var newFiles = await solConnect.readMyFiles();
+    emit(MyFilesRecived(newFiles: newFiles));
+  }
+
+  FutureOr<void> getSharedFilesEvent(
+    GetSharedFilesEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    var newSharedFiles = await solConnect.readSharedFiles();
+    emit(SharedFilesRecived(newFiles: newSharedFiles));
+  }
+
+  FutureOr<void> shareFileEvent(
+    ShareFileEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    var sharedFiles = await solConnect.readSharedFiles();
+    emit(SharedFilesRecived(newFiles: sharedFiles));
+  }
+
+  FutureOr<void> deleteFileEvent(
+    DeleteFileEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    
   }
 }

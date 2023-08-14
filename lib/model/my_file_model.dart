@@ -1,14 +1,14 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:blocdisk/utils.dart';
+import 'package:blocdisk/utils/utils.dart';
 
-class FileModel {
+class MyFileModel {
   final String name;
   final int size;
   final String type;
   final String hash;
-  FileModel({
+  MyFileModel({
     required this.name,
     required this.size,
     required this.type,
@@ -38,10 +38,8 @@ class FileModel {
     };
   }
 
- 
-
-  factory FileModel.fromList(List<dynamic> fileData) {
-    return FileModel(
+  factory MyFileModel.fromList(List<dynamic> fileData) {
+    return MyFileModel(
       name: fileData[0],
       size: fileData[1].toInt(),
       type: GeneralFuntions.getFileType(fileData[0]),
@@ -49,10 +47,10 @@ class FileModel {
     );
   }
 
-  factory FileModel.fromFile(File file, int fileSize) {
+  factory MyFileModel.fromFile(File file, int fileSize) {
     var filename = GeneralFuntions.getFileName(file.path);
     var filetype = GeneralFuntions.getFileType(filename);
-    return FileModel(
+    return MyFileModel(
       name: filename,
       size: fileSize,
       type: filetype,

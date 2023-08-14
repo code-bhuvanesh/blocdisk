@@ -1,7 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:blocdisk/constants.dart';
 
-import '../utils.dart';
+import '../utils/secure_storage.dart';
+
 
 class User {
   static final User instance = User._();

@@ -1,4 +1,4 @@
-import 'package:blocdisk/features/splash_screen/splash_scree.dart';
+import 'package:blocdisk/features/splash_screen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -55,3 +55,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+
+// ToDo: make the download as a background process

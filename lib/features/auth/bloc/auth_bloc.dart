@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:blocdisk/constants.dart';
-import 'package:blocdisk/utils.dart';
 import 'package:meta/meta.dart';
 
 import '../../../model/user.dart';
+import '../../../utils/secure_storage.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';

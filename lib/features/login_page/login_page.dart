@@ -15,14 +15,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // final _publicKeyTextController = TextEditingController();
+  final _publicKeyTextController = TextEditingController();
+  final _privateKeyTextController = TextEditingController();
 
-  // final _privateKeyTextController = TextEditingController();
-  final _publicKeyTextController =
-      TextEditingController(text: "0xff4ce0D8aCB7C9FF642De0ca1df972E59c6636d5");
+  // final _publicKeyTextController =
+  //     TextEditingController(text: "0xff4ce0D8aCB7C9FF642De0ca1df972E59c6636d5");
 
-  final _privateKeyTextController = TextEditingController(
-      text: "8448142232d2f7b498fca1855ab4f8f59fce730cdff824f9f19fb04147e10a5b");
+  // final _privateKeyTextController = TextEditingController(
+  //     text: "8448142232d2f7b498fca1855ab4f8f59fce730cdff824f9f19fb04147e10a5b");
 
   var isLoginLoading = false;
 
@@ -65,7 +65,10 @@ class _LoginPageState extends State<LoginPage> {
                       setState(() {
                         isLoginLoading = false;
                       });
-                      Navigator.of(context).pushNamedAndRemoveUntil(HomePage.routename,(route) => false,);
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        HomePage.routename,
+                        (route) => false,
+                      );
                     } else if (state is LoginFailure) {
                       setState(() {
                         isLoginLoading = false;

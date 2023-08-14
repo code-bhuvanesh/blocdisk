@@ -15,7 +15,7 @@ const String infuraURL =
 // const String privateAddress =
 //     "8448142232d2f7b498fca1855ab4f8f59fce730cdff824f9f19fb04147e10a5b";
 
-const String contractaddress = "0x20160bc2419b81684D7A32DabAA0085Fe21eE7B7";
+const String contractaddress = "0xb878A6e5f2631356FEa2817dF3049dd64C20800F";
 
 const String downloadUrl = "https://gateway.pinata.cloud/ipfs/";
 

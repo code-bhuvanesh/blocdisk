@@ -19,9 +19,16 @@ class FileFinishedDownloading extends HomeState {
 
 class FileOpened extends HomeState {}
 
-class FilesRecived extends HomeState {
-  final List<FileModel> newFiles;
-  FilesRecived({
+class MyFilesRecived extends HomeState {
+  final List<MyFileModel> newFiles;
+  MyFilesRecived({
+    required this.newFiles,
+  });
+}
+
+class SharedFilesRecived extends HomeState {
+  final List<SharedFileModel> newFiles;
+  SharedFilesRecived({
     required this.newFiles,
   });
 }
@@ -31,3 +38,7 @@ class FileUploaded extends HomeState {
 
   FileUploaded({required this.result});
 }
+
+class FileShared extends HomeState {}
+
+class FileDeleted extends HomeState {}

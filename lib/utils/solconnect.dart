@@ -1,52 +1,14 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:blocdisk/constants.dart';
-import 'package:blocdisk/model/file_model.dart';
+import 'package:blocdisk/model/my_file_model.dart';
+import 'package:blocdisk/model/shared_file_model.dart';
 import 'package:blocdisk/model/user.dart';
+import 'package:blocdisk/utils/pinata_client.dart';
+import 'package:blocdisk/utils/utils.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:web3dart/contracts.dart';
 import 'package:web3dart/web3dart.dart';
-
-class PinataClient {
-  static Future<String> uploadFile(File file) async {
-    var url = Uri.parse(filePinningURl);
-    var request = http.MultipartRequest("POST", url);
-
-    request.headers.addAll({
-      'Content-Type': "multipart/form-data",
-      'authorization': "Bearer $jwtToken",
-      'accept': "application/json",
-    });
-
-    request.files.add(
-      await http.MultipartFile.fromPath(
-        "file",
-        file.path,
-      ),
-    );
-    var response = await request.send();
-    var body = jsonDecode(await response.stream.bytesToString())
-        as Map<String, dynamic>;
-    print(body);
-    return body["IpfsHash"] ?? "no hash";
-  }
-
-  static Future<String> testAuth() async {
-    var url = Uri.parse(authURL);
-    var response = await http.get(
-      url,
-      headers: {
-        "accept": "application/json",
-        'authorization': "Bearer $jwtToken",
-      },
-    );
-
-    return response.body;
-  }
-}
 
 class SolConnect {
   late http.Client _httpClient;
@@ -114,7 +76,7 @@ class SolConnect {
 
   Future<void> addFile(File file) async {
     var filehash = await PinataClient.uploadFile(file);
-    var result = await _submit("add", [
+    var result = await _submit("addFile", [
       EthereumAddress.fromHex(User.instance.publicKey),
       filehash,
       GeneralFuntions.getFileName(file.path),
@@ -127,62 +89,42 @@ class SolConnect {
     print("file added");
   }
 
-  Future<List<FileModel>> retriveFiles() async {
-    var result = await _query(
-        "display", [EthereumAddress.fromHex(User.instance.publicKey)]);
+  Future<List<MyFileModel>> readMyFiles() async {
+    var result = await _query("readMyFiles", [
+      EthereumAddress.fromHex(User.instance.publicKey),
+    ]);
     print(result);
     if (result[0] != null) {
       return (result[0] as List<dynamic>)
-          .map((e) => FileModel.fromList(e))
+          .map((e) => MyFileModel.fromList(e))
           .toList();
     }
     return [];
   }
-}
 
-class GeneralFuntions {
-  static String getFileName(String path) {
-    return path.substring(path.lastIndexOf("/") + 1);
-  }
-
-  static String getFileType(String filename) {
-    return filename.substring(filename.lastIndexOf(".") + 1);
-  }
-}
-
-class SecureStorage {
-  final _storage = const FlutterSecureStorage(
-    aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
-    ),
-  );
-
-  Future<String> readSecureData(String key) async {
-    String value = "";
-    try {
-      value = (await _storage.read(key: key)) ?? "";
-    } catch (e) {
-      print(e);
+  Future<List<SharedFileModel>> readSharedFiles() async {
+    var result = await _query("readSharedFiles", [
+      EthereumAddress.fromHex(User.instance.publicKey),
+    ]);
+    print("shared files: $result");
+    if (result[0] != null) {
+      return (result[0] as List<dynamic>)
+          .map((e) => SharedFileModel.fromList(e))
+          .toList();
     }
-    return value;
+    return [];
   }
 
-  Future<void> deleteSecureData(String key) async {
-    try {
-      await _storage.delete(key: key);
-    } catch (e) {
-      print(e);
+  Future<List<MyFileModel>> shareFile(String filehash, anotherUser) async {
+    var result = await _query("readSharedFiles", [
+      EthereumAddress.fromHex(User.instance.publicKey),
+    ]);
+    print("shared files: $result");
+    if (result[0] != null) {
+      return (result[0] as List<dynamic>)
+          .map((e) => MyFileModel.fromList(e))
+          .toList();
     }
-  }
-
-  Future<void> writeSecureData(String key, String value) async {
-    try {
-      await _storage.write(
-        key: key,
-        value: value,
-      );
-    } catch (e) {
-      print(e);
-    }
+    return [];
   }
 }

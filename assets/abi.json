@@ -3,12 +3,12 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "_user",
+				"name": "ownerAddress",
 				"type": "address"
 			},
 			{
 				"internalType": "string",
-				"name": "url",
+				"name": "hash",
 				"type": "string"
 			},
 			{
@@ -22,7 +22,7 @@
 				"type": "uint256"
 			}
 		],
-		"name": "add",
+		"name": "addFile",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -31,11 +31,21 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "user",
+				"name": "ownerAddress",
 				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "anotherUser",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "filehash",
+				"type": "string"
 			}
 		],
-		"name": "allow",
+		"name": "deleteAnotherUserAcess",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -44,11 +54,16 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "user",
+				"name": "ownerAddress",
 				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "hashToRemove",
+				"type": "string"
 			}
 		],
-		"name": "disallow",
+		"name": "deleteFile",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -57,11 +72,34 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "_user",
+				"name": "ownerAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "anotherUser",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "filehash",
+				"type": "string"
+			}
+		],
+		"name": "giveAnotherUserAcess",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "readerAddress",
 				"type": "address"
 			}
 		],
-		"name": "display",
+		"name": "readMyFiles",
 		"outputs": [
 			{
 				"components": [
@@ -77,11 +115,11 @@
 					},
 					{
 						"internalType": "string",
-						"name": "url",
+						"name": "hash",
 						"type": "string"
 					}
 				],
-				"internalType": "struct Upload.File[]",
+				"internalType": "struct BlocDisk.File[]",
 				"name": "",
 				"type": "tuple[]"
 			}
@@ -90,8 +128,14 @@
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "shareAccess",
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "readerAddress",
+				"type": "address"
+			}
+		],
+		"name": "readSharedFiles",
 		"outputs": [
 			{
 				"components": [
@@ -101,12 +145,29 @@
 						"type": "address"
 					},
 					{
-						"internalType": "bool",
-						"name": "access",
-						"type": "bool"
+						"components": [
+							{
+								"internalType": "string",
+								"name": "name",
+								"type": "string"
+							},
+							{
+								"internalType": "uint256",
+								"name": "size",
+								"type": "uint256"
+							},
+							{
+								"internalType": "string",
+								"name": "hash",
+								"type": "string"
+							}
+						],
+						"internalType": "struct BlocDisk.File",
+						"name": "File",
+						"type": "tuple"
 					}
 				],
-				"internalType": "struct Upload.Access[]",
+				"internalType": "struct BlocDisk.SharedFile[]",
 				"name": "",
 				"type": "tuple[]"
 			}

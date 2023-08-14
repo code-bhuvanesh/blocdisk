@@ -1,15 +1,12 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
+import 'package:blocdisk/features/home_page/tabs/myfiles.dart';
+import 'package:blocdisk/features/home_page/tabs/sharedfiles.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../model/file_model.dart';
-import '../../utils.dart';
+import '../../model/my_file_model.dart';
+import '../../utils/solconnect.dart';
 import 'bloc/home_bloc.dart';
-import 'widgets/file_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,12 +17,12 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<HomePage> {
   List<Widget> fileWidgets = [];
-  List<FileModel> filesList = [];
+  List<MyFileModel> filesList = [];
   var solConnect = SolConnect();
 
-  bool _isFABVisible = true;
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -37,8 +34,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     askPermission();
-    context.read<HomeBloc>().add(GetFielsEvent());
-    _scrollController.addListener(_updateFABVisibility);
+
+    _tabController = TabController(length: 2, vsync: this);
+
     super.initState();
   }
 
@@ -51,121 +49,44 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> onUploadFile() async {
-    var result = await FilePicker.platform.pickFiles();
-    if (result != null) {
-      File file = File(result.files.first.path!);
-      if (mounted) {
-        context.read<HomeBloc>().add(UploadFileEvent(uploadfile: file));
-      }
-      var fileSize = await file.length();
+  late TabController _tabController;
 
-      setState(() {
-        filesList.add(FileModel.fromFile(file, fileSize));
-        fileWidgets.add(BlocProvider(
-          create: (context) => HomeBloc(),
-          child: FileWidget(
-            file: filesList.last,
-            isUploading: true,
-            parentContext: context,
-          ),
-        ));
-      });
-    } else {
-      Fluttertoast.showToast(msg: "select a file to upload");
-    }
-  }
-
-  void getFiles() async {
-    setState(() {
-      // filesList.addAll(newFiles);
-      fileWidgets = filesList
-          .map(
-            (e) => BlocProvider(
-              create: (context) => HomeBloc(),
-              child: FileWidget(
-                file: e,
-                isUploading: false,
-                parentContext: context,
-              ),
-            ),
-          )
-          .toList();
-      isLoading = false;
-    });
-  }
-
-  void _updateFABVisibility() {
-    print(_scrollController.position);
-    if (_scrollController.position.atEdge) {
-      if (_scrollController.position.pixels == 0) {
-        // Scrolled to the top
-        setState(() {
-          _isFABVisible = true;
-        });
-      } else {
-        // Scrolled to the bottom
-        setState(() {
-          _isFABVisible = false;
-        });
-      }
-    } else {
-      setState(() {
-        _isFABVisible = true;
-      });
-    }
-  }
-
-  bool isLoading = true;
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return BlocListener<HomeBloc, HomeState>(
-      listener: (context, state) {
-        if (state is FileUploaded) {
-          Fluttertoast.showToast(msg: "file Uploaded");
-        }
-        if (state is FilesRecived) {
-          filesList = state.newFiles;
-          getFiles();
-        }
-      },
+      listener: (context, state) {},
       child: Scaffold(
         appBar: AppBar(
           title: const Text(
-            "Files",
+            "Bloc Disk",
             style: TextStyle(
               fontSize: 30,
             ),
           ),
-        ),
-        body: (filesList.isNotEmpty && !isLoading)
-            ? ListView.builder(
-                controller: _scrollController,
-                itemCount: filesList.length,
-                itemBuilder: (context, index) =>
-                    fileWidgets[filesList.length - (index + 1)],
-              )
-            : filesList.isEmpty && !isLoading
-                ? const Center(
-                    child: Text("no files uploaded"),
-                  )
-                : const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-        floatingActionButton: Visibility(
-          visible: _isFABVisible,
-          child: AnimatedOpacity(
-            opacity: _isFABVisible ? 1.0 : 0.0,
-            duration: const Duration(seconds: 1),
-            child: FloatingActionButton(
-              onPressed: onUploadFile,
-              child: const Icon(
-                Icons.add,
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: const <Widget>[
+              Tab(
+                child: Text("MyFiles"),
               ),
-            ),
+              Tab(
+                child: Text("Shared"),
+              ),
+            ],
           ),
+        ),
+        body: TabBarView(
+          controller: _tabController,
+          children: const [
+            MyFilesTab(),
+            SharedFilesTab(),
+          ],
         ),
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

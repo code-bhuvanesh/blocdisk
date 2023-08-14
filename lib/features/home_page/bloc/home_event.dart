@@ -5,7 +5,7 @@ part of 'home_bloc.dart';
 sealed class HomeEvent {}
 
 class DownloadFileEvent extends HomeEvent {
-  final FileModel file;
+  final MyFileModel file;
 
   DownloadFileEvent({required this.file});
 }
@@ -27,6 +27,21 @@ class UploadFileEvent extends HomeEvent {
     required this.uploadfile,
   });
 }
-class GetFielsEvent extends HomeEvent{
- 
+
+class GetMyFilesEvent extends HomeEvent {}
+
+class GetSharedFilesEvent extends HomeEvent {}
+
+class ShareFileEvent extends HomeEvent {
+  final String filehash;
+  ShareFileEvent({
+    required this.filehash,
+  });
+}
+
+class DeleteFileEvent extends HomeEvent {
+  final String filehash;
+  DeleteFileEvent({
+    required this.filehash,
+  });
 }
