@@ -1,12 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
-import 'package:blocdisk/features/home_page/widgets/enterUserAddressMenu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blocdisk/features/home_page/widgets/context_menu.dart';
+import 'package:blocdisk/features/home_page/widgets/enterUserAddressMenu.dart';
+import 'package:blocdisk/utils/utils.dart';
 
 import '../../../constants.dart';
 import '../../../model/my_file_model.dart';
@@ -18,13 +19,15 @@ class FileWidget extends StatefulWidget {
     required this.file,
     required this.isUploading,
     required this.parentContext,
+    required this.index,
     required this.delteFile,
   }) : super(key: key);
 
   final MyFileModel file;
   final bool isUploading;
   final BuildContext parentContext;
-  final void Function() delteFile;
+  final int index;
+  final void Function(int) delteFile;
 
   @override
   State<FileWidget> createState() => _FileWidgetState();
@@ -67,7 +70,7 @@ class _FileWidgetState extends State<FileWidget> {
 
   void _deleteFile() {
     context.read<HomeBloc>().add(DeleteFileEvent(filehash: widget.file.hash));
-    widget.delteFile();
+    widget.delteFile(widget.index);
   }
 
   Future<void> _openPopUpMenu() async {
@@ -102,6 +105,7 @@ class _FileWidgetState extends State<FileWidget> {
       context.read<HomeBloc>().add(
             DownloadFileEvent(
               file: widget.file,
+              index: widget.index,
             ),
           );
       setState(() {
@@ -122,17 +126,21 @@ class _FileWidgetState extends State<FileWidget> {
     return BlocListener<HomeBloc, HomeState>(
       listener: (context, state) {
         if (state is FileDownloadingProgress) {
-          print("downloading : ${state.progress}");
-          setState(() {
-            isDownloading = true;
-            downloadingPercentage = state.progress;
-          });
+          if (state.index == widget.index) {
+            print("downloading : ${state.progress}");
+            setState(() {
+              isDownloading = true;
+              downloadingPercentage = state.progress;
+            });
+          }
         }
         if (state is FileFinishedDownloading) {
-          setState(() {
-            isDownloading = false;
-            isDownloaded = true;
-          });
+          if (state.index == widget.index) {
+            setState(() {
+              isDownloading = false;
+              isDownloaded = true;
+            });
+          }
         }
       },
       child: Container(
@@ -167,7 +175,11 @@ class _FileWidgetState extends State<FileWidget> {
                         const SizedBox(
                           height: 10,
                         ),
-                        Text(widget.file.name),
+                        Text(
+                          GeneralFuntions.shortenNames(
+                            widget.file.name,
+                          ),
+                        ),
                         Text(
                           widget.file.getFileSize(),
                         ),

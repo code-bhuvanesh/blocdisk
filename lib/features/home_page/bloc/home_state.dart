@@ -8,13 +8,22 @@ final class HomeInitial extends HomeState {}
 
 class FileDownloadingProgress extends HomeState {
   final double progress;
+  final int index;
 
-  FileDownloadingProgress({required this.progress});
+  FileDownloadingProgress({
+    required this.progress,
+    required this.index,
+  });
 }
 
 class FileFinishedDownloading extends HomeState {
   final String filePath;
-  FileFinishedDownloading({required this.filePath});
+  final int index;
+
+  FileFinishedDownloading({
+    required this.index,
+    required this.filePath,
+  });
 }
 
 class FileOpened extends HomeState {}

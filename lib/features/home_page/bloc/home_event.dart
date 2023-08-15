@@ -6,14 +6,22 @@ sealed class HomeEvent {}
 
 class DownloadFileEvent extends HomeEvent {
   final MyFileModel file;
+  final int index;
 
-  DownloadFileEvent({required this.file});
+  DownloadFileEvent({
+    required this.file,
+    required this.index,
+  });
 }
 
 class DownloadedProgress extends HomeEvent {
   final double progress;
+  final int index;
 
-  DownloadedProgress({required this.progress});
+  DownloadedProgress({
+    required this.progress,
+    required this.index,
+  });
 }
 
 class OpenFileEvent extends HomeEvent {

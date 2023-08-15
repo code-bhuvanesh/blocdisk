@@ -83,7 +83,7 @@ class SolConnect {
       GeneralFuntions.getFileName(file.path),
       BigInt.from(await file.length()),
     ]);
-    print("sumbit result : $result");
+    print("add file id : $result");
     print("filename: ${GeneralFuntions.getFileName(file.path)}");
     print("filesize: ${await file.length()}");
     print("filehash: $filehash");
@@ -122,20 +122,22 @@ class SolConnect {
       Fluttertoast.showToast(msg: "you cannot share to yourself");
       return;
     }
-    await _submit("giveAnotherUserAcess", [
+    var result = await _submit("giveAnotherUserAcess", [
       EthereumAddress.fromHex(User.instance.publicKey),
       EthereumAddress.fromHex(anotherUser),
-      filehash,
+      filehash
     ]);
 
+    print("share file id: $result");
     Fluttertoast.showToast(msg: "file shared");
   }
 
   Future<void> deleteFile(String filehash) async {
-    print(await _submit("deleteFile", [
+    var result = await _submit("deleteFile", [
       EthereumAddress.fromHex(User.instance.publicKey),
       filehash,
-    ]));
+    ]);
+    print("delete file id: $result");
     Fluttertoast.showToast(msg: "file will be deleted within 20sec");
   }
 }

@@ -1,10 +1,9 @@
-import 'package:blocdisk/constants.dart';
 import 'package:flutter/material.dart';
 
 class AddressPopupMenu extends StatelessWidget {
   AddressPopupMenu({super.key});
 
-  var textController = TextEditingController();
+  final textController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     var h = MediaQuery.of(context).size.height;

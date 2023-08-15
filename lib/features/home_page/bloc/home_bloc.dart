@@ -47,12 +47,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       await for (final value in response.stream) {
         received += value.length;
         bytes.addAll(value);
-        add(DownloadedProgress(progress: received / total));
+        add(DownloadedProgress(progress: received / total, index: event.index));
         print("downloaded: $received / $total");
       }
       final file = File(downloadLocation + fileModel.name);
       await file.writeAsBytes(bytes);
-      emit(FileFinishedDownloading(filePath: file.path));
+      emit(FileFinishedDownloading(filePath: file.path, index: event.index));
     } else {
       print("file already donwnloaded");
     }
@@ -66,7 +66,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     DownloadedProgress event,
     Emitter<HomeState> emit,
   ) {
-    emit(FileDownloadingProgress(progress: event.progress));
+    emit(FileDownloadingProgress(progress: event.progress, index: event.index));
     emit(HomeInitial());
   }
 

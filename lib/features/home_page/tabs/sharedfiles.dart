@@ -31,13 +31,16 @@ class _SharedFilesTabState extends State<SharedFilesTab> {
     setState(() {
       // filesList.addAll(newFiles);
       fileWidgets = filesList
+          .asMap()
+          .entries
           .map(
             (e) => BlocProvider(
               create: (context) => HomeBloc(),
               child: SharedFileWidget(
-                file: e,
+                file: e.value,
                 isUploading: false,
                 parentContext: context,
+                index: e.key,
               ),
             ),
           )

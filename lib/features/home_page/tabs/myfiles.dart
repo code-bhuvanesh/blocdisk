@@ -57,7 +57,8 @@ class _MyFilesTabState extends State<MyFilesTab> {
           file: filesList.last,
           isUploading: true,
           parentContext: context,
-          delteFile: () => delteFile(fileWidgets.length),
+          delteFile: delteFile,
+          index: fileWidgets.length,
         ));
       });
     } else {
@@ -98,7 +99,8 @@ class _MyFilesTabState extends State<MyFilesTab> {
               file: entry.value,
               isUploading: false,
               parentContext: context,
-              delteFile: () => delteFile(entry.key),
+              delteFile: delteFile,
+              index: entry.key,
             ),
           )
           .toList();

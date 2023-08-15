@@ -26,7 +26,10 @@ dependencies:
   bloc: ^8.1.2
   flutter_bloc: ^8.1.3
   flutter_secure_storage: ^8.0.0
-  
+  flutter_native_splash: ^2.3.2
+  flutter_launcher_icons: ^0.13.1
+ 
+    
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -39,7 +42,7 @@ flutter:
 
   assets:
     - assets/abi.json
-    - assets/icons/file_icon.png
+    - assets/icons/
   
   
 
