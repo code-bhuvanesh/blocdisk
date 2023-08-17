@@ -64,15 +64,22 @@
 			}
 		],
 		"name": "deleteFile",
-		"outputs": [
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
 			{
+				"indexed": false,
 				"internalType": "string",
-				"name": "",
+				"name": "filename",
 				"type": "string"
 			}
 		],
-		"stateMutability": "nonpayable",
-		"type": "function"
+		"name": "fileUploaded",
+		"type": "event"
 	},
 	{
 		"inputs": [

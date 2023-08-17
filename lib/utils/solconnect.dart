@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:blocdisk/constants.dart';
@@ -46,6 +47,22 @@ class SolConnect {
     return result;
   }
 
+  Future<String> _checkTrasactionStatus(String transactionHash) async {
+    Uri url = Uri.parse(
+      "$etherscanUrl?module=transaction&action=gettxreceiptstatus&txhash=$transactionHash&apikey=$etherscanApiKey",
+    );
+    var response = await http.get(url);
+    Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+    jsonResponse = jsonResponse["result"] as Map<String, dynamic>;
+    if (jsonResponse["status"] == "") {
+      await Future.delayed(const Duration(seconds: 1));
+      print("checking trasacation again......");
+      _checkTrasactionStatus(transactionHash);
+    }
+    print("tranasction result : ${response.body}");
+    return jsonResponse["status"];
+  }
+
   Future<String> _submit(String funtionName, List<dynamic> args) async {
     await loadContract();
     EthPrivateKey credential = EthPrivateKey.fromHex(
@@ -63,6 +80,16 @@ class SolConnect {
       ),
       chainId: 11155111,
     );
+
+    // _ethClient
+    //     .events(FilterOptions.events(
+    //         contract: _contract,
+    //         event: ContractEvent(false, "fileUploaded", [])))
+    //     .listen((event) {
+    //   print(event);
+    //   print("file stored");
+    // });
+    // print("file upload id: $result");
     return result;
   }
 
@@ -83,7 +110,9 @@ class SolConnect {
       GeneralFuntions.getFileName(file.path),
       BigInt.from(await file.length()),
     ]);
+
     print("add file id : $result");
+    await _checkTrasactionStatus(result);
     print("filename: ${GeneralFuntions.getFileName(file.path)}");
     print("filesize: ${await file.length()}");
     print("filehash: $filehash");

@@ -85,7 +85,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     await solConnect.getBalance();
     await solConnect.readMyFiles();
     await solConnect.addFile(event.uploadfile);
-    await Future.delayed(const Duration(seconds: 15));
+    // await Future.delayed(const Duration(seconds: 15));
     add(GetMyFilesEvent());
     emit(FileUploaded(result: "uploaded"));
   }

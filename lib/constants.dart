@@ -15,7 +15,7 @@ const String infuraURL =
 // const String privateAddress =
 //     "8448142232d2f7b498fca1855ab4f8f59fce730cdff824f9f19fb04147e10a5b";
 
-const String contractaddress = "0x3d8878455acd3cb9e7EE91A25ee32f7238682E58";
+const String contractaddress = "0x288F79098c658fd714d4Ac5C4DE99CACE6Aab1a4";
 
 const String downloadUrl = "https://gateway.pinata.cloud/ipfs/";
 
@@ -23,3 +23,6 @@ const String downloadLocation = "/storage/emulated/0/Download/";
 
 const String PUBLICKEY = "publickey";
 const String PRIVATEKEY = "privatekey";
+
+const etherscanUrl = "https://api-sepolia.etherscan.io/api";
+const etherscanApiKey = "RVMFT31YR63XKCJPIWXERF3CM6MXB1V1KS";

@@ -40,6 +40,7 @@ class _FileWidgetState extends State<FileWidget> {
 
   Future<void> checkIfFileExist() async {
     if (await File(downloadLocation + widget.file.name).exists()) {
+      if (!mounted) return;
       setState(() {
         isDownloaded = true;
       });
