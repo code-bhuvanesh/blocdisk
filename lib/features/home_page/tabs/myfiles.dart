@@ -19,7 +19,6 @@ class MyFilesTab extends StatefulWidget {
 
 class _MyFilesTabState extends State<MyFilesTab> {
   List<Widget> fileWidgets = [];
-  List<MyFileModel> filesList = [];
   var solConnect = SolConnect();
   bool isLoading = true;
 
@@ -37,73 +36,33 @@ class _MyFilesTabState extends State<MyFilesTab> {
     var result = await FilePicker.platform.pickFiles();
     if (result != null) {
       File file = File(result.files.first.path!);
-      if (mounted) {
-        context.read<HomeBloc>().add(UploadFileEvent(uploadfile: file));
-      }
-      var fileSize = await file.length();
-
-      setState(() {
-        filesList.add(MyFileModel.fromFile(file, fileSize));
-        // fileWidgets.add(BlocProvider(
-        //   create: (context) => HomeBloc(),
-        //   child: FileWidget(
-        //     file: filesList.last,
-        //     isUploading: true,
-        //     parentContext: context,
-        //     delteFile: () => delteFile(fileWidgets.length),
-        //   ),
-        // ));
-        fileWidgets.add(FileWidget(
-          file: filesList.last,
-          isUploading: true,
-          parentContext: context,
-          delteFile: delteFile,
-          index: fileWidgets.length,
-        ));
-      });
+      if (!mounted) return;
+      context.read<HomeBloc>().add(UploadFileEvent(uploadfile: file));
     } else {
       Fluttertoast.showToast(msg: "select a file to upload");
     }
   }
 
-  
   void delteFile(int index) {
     setState(() {
       fileWidgets.removeAt(index);
-      filesList.removeAt(index);
     });
-    getFiles();
   }
 
-  void getFiles() async {
+  void getFiles(Map<MyFileModel, bool> newFiles) async {
+    fileWidgets.clear();
     setState(() {
-      // filesList.addAll(newFiles);
-      // fileWidgets = filesList
-      //     .map(
-      //       (e) => BlocProvider(
-      //         create: (context) => HomeBloc(),
-      //         child: FileWidget(
-      //           file: e,
-      //           isUploading: false,
-      //           parentContext: context,
-      //           delteFile: () => delteFile(),
-      //         ),
-      //       ),
-      //     )
-      //     .toList();
-      fileWidgets = filesList
-          .asMap()
-          .entries
-          .map(
-            (entry) => FileWidget(
-              file: entry.value,
-              isUploading: false,
-              parentContext: context,
-              delteFile: delteFile,
-              index: entry.key,
-            ),
-          )
-          .toList();
+      int index = 0;
+      newFiles.forEach((fileWidget, isUploading) {
+        fileWidgets.add(FileWidget(
+          file: fileWidget,
+          isUploading: isUploading,
+          parentContext: context,
+          delteFile: delteFile,
+          index: index,
+        ));
+        index++;
+      });
       isLoading = false;
     });
   }
@@ -151,27 +110,26 @@ class _MyFilesTabState extends State<MyFilesTab> {
               Fluttertoast.showToast(msg: "file Uploaded");
             }
             if (state is MyFilesRecived) {
-              filesList = state.newFiles;
-              getFiles();
+              getFiles(state.newFiles);
             }
           },
           child: RefreshIndicator(
             onRefresh: () async {
               context.read<HomeBloc>().add(GetMyFilesEvent());
             },
-            child: (filesList.isNotEmpty && !isLoading)
+            child: (fileWidgets.isNotEmpty && !isLoading)
                 ? RefreshIndicator(
                     onRefresh: () async {
                       context.read<HomeBloc>().add(GetMyFilesEvent());
                     },
                     child: ListView.builder(
                       controller: _scrollController,
-                      itemCount: filesList.length,
+                      itemCount: fileWidgets.length,
                       itemBuilder: (context, index) =>
-                          fileWidgets[filesList.length - (index + 1)],
+                          fileWidgets[fileWidgets.length - (index + 1)],
                     ),
                   )
-                : filesList.isEmpty && !isLoading
+                : fileWidgets.isEmpty && !isLoading
                     ? const Center(
                         child: Text("no files uploaded"),
                       )

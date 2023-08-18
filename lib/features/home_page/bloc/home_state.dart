@@ -29,7 +29,7 @@ class FileFinishedDownloading extends HomeState {
 class FileOpened extends HomeState {}
 
 class MyFilesRecived extends HomeState {
-  final List<MyFileModel> newFiles;
+  final Map<MyFileModel, bool> newFiles;
   MyFilesRecived({
     required this.newFiles,
   });

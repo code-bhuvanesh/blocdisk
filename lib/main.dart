@@ -17,8 +17,15 @@ void main() {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  runApp(BlocProvider(
-    create: (context) => AuthBloc(),
+  runApp(MultiBlocProvider(
+    providers: [
+      BlocProvider(
+        create: (context) => AuthBloc(),
+      ),
+      BlocProvider(
+        create: (context) => LoginBloc(),
+      ),
+    ],
     child: const MyApp(),
   ));
 }

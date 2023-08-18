@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:blocdisk/model/my_file_model.dart';
+import 'package:blocdisk/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:open_file_plus/open_file_plus.dart';
@@ -28,6 +29,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   var solConnect = SolConnect();
+
+  Map<MyFileModel, bool> myFilesModel = {};
 
   Future<FutureOr<void>> downloadFileEvent(
     DownloadFileEvent event,
@@ -82,20 +85,46 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     UploadFileEvent event,
     Emitter<HomeState> emit,
   ) async {
+    var uploadfileSize = await event.uploadfile.length();
+    var uploadFilModel = MyFileModel.fromFile(event.uploadfile, uploadfileSize);
+    emit(MyFilesRecived(newFiles: myFilesModel));
+    myFilesModel.addAll({uploadFilModel: true});
     await solConnect.getBalance();
     await solConnect.readMyFiles();
-    await solConnect.addFile(event.uploadfile);
+    var filehash = await solConnect.addFile(event.uploadfile);
     // await Future.delayed(const Duration(seconds: 15));
-    add(GetMyFilesEvent());
+
+    //after file uploaded remove uplloading and add new
+    myFilesModel.removeWhere((key, value) => key == uploadFilModel);
+    var filename = GeneralFuntions.getFileName(event.uploadfile.path);
+    var filetype = GeneralFuntions.getFileType(filename);
+    var newFile = MyFileModel(
+      hash: filehash,
+      name: filename,
+      type: filetype,
+      size: uploadfileSize,
+    );
+    myFilesModel.addAll({newFile: false});
+    // add(GetMyFilesEvent());
+    emit(MyFilesRecived(newFiles: myFilesModel));
     emit(FileUploaded(result: "uploaded"));
+  }
+
+  bool CheckIfFileExist() {
+    //todo: check files exist befor uploading
+    return false;
   }
 
   Future<FutureOr<void>> getMyFilesEvent(
     GetMyFilesEvent event,
     Emitter<HomeState> emit,
   ) async {
+    myFilesModel.clear();
     var newFiles = await solConnect.readMyFiles();
-    emit(MyFilesRecived(newFiles: newFiles));
+    newFiles.forEach((element) {
+      myFilesModel.addAll({element: false});
+    });
+    emit(MyFilesRecived(newFiles: myFilesModel));
   }
 
   FutureOr<void> getSharedFilesEvent(

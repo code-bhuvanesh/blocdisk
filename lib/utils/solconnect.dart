@@ -48,18 +48,20 @@ class SolConnect {
   }
 
   Future<String> _checkTrasactionStatus(String transactionHash) async {
+    Map<String, dynamic> jsonResponse = {"status": ""};
     Uri url = Uri.parse(
       "$etherscanUrl?module=transaction&action=gettxreceiptstatus&txhash=$transactionHash&apikey=$etherscanApiKey",
     );
-    var response = await http.get(url);
-    Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-    jsonResponse = jsonResponse["result"] as Map<String, dynamic>;
-    if (jsonResponse["status"] == "") {
-      await Future.delayed(const Duration(seconds: 1));
+    print("transaction id: $transactionHash");
+    while (jsonResponse["status"] == "") {
       print("checking trasacation again......");
-      _checkTrasactionStatus(transactionHash);
+      var response = await http.get(url);
+      jsonResponse = jsonDecode(response.body);
+      jsonResponse = jsonResponse["result"] as Map<String, dynamic>;
+
+      print("tranasction result : ${response.body}");
+      await Future.delayed(const Duration(seconds: 3));
     }
-    print("tranasction result : ${response.body}");
     return jsonResponse["status"];
   }
 
@@ -81,6 +83,7 @@ class SolConnect {
       chainId: 11155111,
     );
 
+    await _checkTrasactionStatus(result);
     // _ethClient
     //     .events(FilterOptions.events(
     //         contract: _contract,
@@ -102,7 +105,7 @@ class SolConnect {
 
   //call sol functions
 
-  Future<void> addFile(File file) async {
+  Future<String> addFile(File file) async {
     var filehash = await PinataClient.uploadFile(file);
     var result = await _submit("addFile", [
       EthereumAddress.fromHex(User.instance.publicKey),
@@ -112,11 +115,12 @@ class SolConnect {
     ]);
 
     print("add file id : $result");
-    await _checkTrasactionStatus(result);
+    // await _checkTrasactionStatus(result);
     print("filename: ${GeneralFuntions.getFileName(file.path)}");
     print("filesize: ${await file.length()}");
     print("filehash: $filehash");
     print("file added");
+    return filehash;
   }
 
   Future<List<MyFileModel>> readMyFiles() async {

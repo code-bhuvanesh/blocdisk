@@ -1,5 +1,7 @@
+import 'package:blocdisk/features/auth/bloc/auth_bloc.dart';
 import 'package:blocdisk/features/home_page/tabs/myfiles.dart';
 import 'package:blocdisk/features/home_page/tabs/sharedfiles.dart';
+import 'package:blocdisk/features/login_page/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -54,16 +56,44 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return BlocListener<HomeBloc, HomeState>(
-      listener: (context, state) {},
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<HomeBloc, HomeState>(
+          listener: (context, state) {},
+        ),
+        BlocListener<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is Logedout) {
+              Navigator.of(context).popAndPushNamed(LoginPage.routename);
+            }
+          },
+        ),
+      ],
       child: Scaffold(
         appBar: AppBar(
           title: const Text(
             "Bloc Disk",
             style: TextStyle(
-              fontSize: 30,
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Valorent',
             ),
           ),
+          leading: Container(
+              child: Image.asset('assets/icons/logo.png', fit: BoxFit.contain)),
+          actions: [
+            PopupMenuButton(
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  child: TextButton(
+                      onPressed: () {
+                        context.read<AuthBloc>().add(LogoutEvent());
+                      },
+                      child: Text("logout")),
+                )
+              ],
+            )
+          ],
           bottom: TabBar(
             controller: _tabController,
             tabs: const <Widget>[

@@ -13,11 +13,14 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc() : super(AuthInitial()) {
     on<AppStarted>(appStarted);
+    on<LogoutEvent>(logout);
   }
 
   SecureStorage secureStorage = SecureStorage();
   Future<FutureOr<void>> appStarted(
-      AppStarted event, Emitter<AuthState> emit) async {
+    AppStarted event,
+    Emitter<AuthState> emit,
+  ) async {
     var publicKey = await secureStorage.readSecureData(PUBLICKEY);
     var privateKey = await secureStorage.readSecureData(PRIVATEKEY);
 
@@ -29,5 +32,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } else {
       emit(UnAuthenticated());
     }
+  }
+
+  Future<void> logout(LogoutEvent event, Emitter<AuthState> emit) async {
+    await secureStorage.deleteSecureData(PUBLICKEY);
+    await secureStorage.deleteSecureData(PRIVATEKEY);
+    emit(Logedout());
   }
 }

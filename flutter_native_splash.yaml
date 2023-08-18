@@ -1,7 +1,7 @@
 flutter_native_splash:
  
   color: "#fafafa"
-  background_image: "assets/icons/splash_icon.png"
+  background_image: assets/icons/app_icon.png
 
   #image: assets/splash.png
 
@@ -15,14 +15,14 @@ flutter_native_splash:
 
   android_12:
    
-    image: "assets/icons/splash_icon.png"
+    image: assets/icons/app_icon.png
 
     # Splash screen background color.
     color: "#fafafa"
 
     #icon_background_color: "#111111"
 
-    #branding: assets/dart.png
+    branding: assets/icons/text_logo.png
     #image_dark: assets/android12splash-invert.png
     #color_dark: "#042a49"
     #icon_background_color_dark: "#eeeeee"

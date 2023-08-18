@@ -37,18 +37,16 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
 flutter:
-
   uses-material-design: true
-
+  
   assets:
     - assets/abi.json
     - assets/icons/
-  
-  
-
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
+    - assets/fonts/
+  fonts:
+    - family: Lobster
+      fonts:
+        - asset: assets/fonts/Lobster-Regular.ttf
+    - family: Valorent
+      fonts:
+        - asset: assets/fonts/Valorant Font.ttf
